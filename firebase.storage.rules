@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+       allow read: if request.auth != null;
+       
+       // https://qiita.com/nkmrh/items/17e14ce379582af26c0c
+       allow write: if (request.auth != null && request.resource == null)
+                      || (request.auth != null &&
+                      request.resource.size < 5 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*'));
+    }
+  }
+}

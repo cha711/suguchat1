@@ -1,0 +1,127 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "rooms": {
+      "$id": {
+        ".read": "!root.child('rooms').child($id).child('blacklist').child(auth.uid).exists()",
+        ".write": "!data.exists() || data.child('hid').val() === auth.uid",
+        ".validate": "newData.hasChildren(['hid', 'name', 'blacklist', 'createdAt'])",
+        "hid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "name": {
+          ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 15"
+        },
+        "blacklist": {
+          "$bid": {
+            "uid": {
+              ".validate": "newData.isString()"
+            }
+          }
+        },
+        "createdAt": {
+          ".validate": "newData.val() <= now"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "boards": {
+      "$rid": {
+        ".read": "root.child('rooms').child($rid).child('blacklist').child(auth.uid).exists() === false",
+        ".indexOn": "createdAt",
+        "$bid": {
+          ".write": "root.child('rooms').child($rid).child('blacklist').child(auth.uid).exists() === false && !data.exists() || data.child('uid').val() === auth.uid || root.child('rooms').child($rid).child('hid').val() === auth.uid",
+          ".validate": "newData.hasChildren(['uid','message', 'image', 'name', 'createdAt'])",
+          "uid": {
+            ".validate": "newData.val() === auth.uid"
+          },
+          "message": {
+            ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 150"
+          },
+          "name": {
+            ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 15"
+          },
+          "image": {
+            ".validate": "newData.isBoolean()"
+          },
+          "createdAt": {
+            ".validate": "newData.val() <= now"
+          },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+
+    "dm_rooms": {
+      "$id": {
+        ".validate": "newData.hasChildren(['member1', 'member2', 'createdAt'])",
+        "member1": {
+          ".validate": "newData.isString()"
+        },
+        "member2": {
+          ".validate": "newData.isString()"
+        },
+        "createdAt": {
+          ".validate": "newData.val() <= now"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "dm_boards": {
+      "$rid": {
+        ".read": "root.child('dm_rooms').child($rid).child('member1').val() === auth.uid || root.child('dm_rooms').child($rid).child('member2').val() === auth.uid",
+        ".indexOn": "createdAt",
+        "$bid": {
+          ".write": "root.child('dm_rooms').child($rid).child('member1').val() === auth.uid || root.child('dm_rooms').child($rid).child('member2').val() === auth.uid",
+          ".validate": "newData.hasChildren(['uid','message', 'image', 'name', 'createdAt'])",
+          "uid": {
+            ".validate": "newData.val() === auth.uid"
+          },
+          "message": {
+            ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 150"
+          },
+          "name": {
+            ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 15"
+          },
+          "image": {
+            ".validate": "newData.isBoolean()"
+          },
+          "createdAt": {
+            ".validate": "newData.val() <= now"
+          },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+
+    "notifications": {
+      "$rid": {
+        "$partner": {
+          ".read": "auth.uid === $partner && root.child('rooms').child($rid).exists()",
+          ".indexOn": "createdAt",
+          "$bid": {
+            ".write": "!data.exists() || data.child('uid').val() === auth.uid",
+            ".validate": "newData.hasChildren(['uid','message','name', 'createdAt'])",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() === auth.uid"
+            },
+            "message": {
+              ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 150"
+            },
+            "name": {
+              ".validate": "newData.isString() && 0 < newData.val().length && newData.val().length <= 15"
+            },
+            "createdAt": {
+              ".validate": "newData.val() <= now"
+            },
+            "$other": { ".validate": false }
+          }
+        }
+      }
+    }
+  }
+}
