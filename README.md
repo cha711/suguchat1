@@ -1,6 +1,3 @@
-## 成果物
-https://suguchat1.netlify.app
-
 ## 使用ライブラリ周り
 
 - FireBase Realtime Database
